@@ -125,5 +125,5 @@ module.exports = {
 
 // Demo
 const linkedList = new SinglyLinkedList();
-linkedList.append(2).append(3);
+linkedList.append(2).append(3).append(5);
 console.log(linkedList);
