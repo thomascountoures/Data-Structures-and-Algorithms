@@ -58,9 +58,9 @@ class Stack {
   }
 
   pop() {
-    this.stack.pop();
+    const value = this.stack.pop();
     this.size--;
-    return this;
+    return value;
   }
 
   peek() {
