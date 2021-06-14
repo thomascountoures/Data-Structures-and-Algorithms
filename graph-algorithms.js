@@ -1,4 +1,5 @@
 const UndirectedGraphSinglyLinkedList = require('./undirected-graphs').UndirectedGraphSinglyLinkedList;
+const Stack = require('./stacksandqueues').Stack;
 
 /**
  * A set of useful graph algorithms for coding interviews.
@@ -7,6 +8,59 @@ const UndirectedGraphSinglyLinkedList = require('./undirected-graphs').Undirecte
  * Code and descriptions By Thomas Countoures
  */
 class GraphAlgorithms {
+  static BFS(graph) {
+    const vertices = graph.vertices;
+    const stack = new Stack(vertices);
+
+    // Create a visited object. This is to mark nodes as visited
+    // once we add them to the stack. We don't want to re-explore
+    // nodes that we have already visited.
+    const visited = {};
+    const result = [];
+
+    // Iterate over source nodes. If source node has not already
+    // been visited, push that value onto the stack to begin
+    // exploring adjacent nodes.
+    for (let source = 0; source < vertices; source++) {
+      if (!(source in visited)) {
+        stack.push(source);
+        visited[source] = true;
+      }
+      // Continue to pull values from the top of the stack.
+      // We will pull a node value from the top, and then
+      // immediately add its adjacent nodes onto the stack,
+      // if those nodes have not already been visited.
+      while (!stack.isEmpty()) {
+        const value = stack.pop();
+        result.push(value);
+        let immediateAdjacent = graph.adjacencyList[value].getHead();
+
+        // Since this is a linked list, we have to iterate over each
+        // node in the linked list and add them to the stack. If the
+        // adjacent nodes were based in an array instead of a linked
+        // list, we would be iterating over them using a for loop
+        // instead of a while loop, for example.
+        while (immediateAdjacent) {
+          const value = immediateAdjacent.value;
+          // Important: only add node values to the stack if they
+          // haven't yet been visited.
+          if (!(value in visited)) {
+            stack.push(value);
+            visited[value] = true;
+          }
+          // Though it might be obvious, it's important to note here
+          // that this line is outside of the if block. We always
+          // want to see the next adjacent node, if there is any.
+          // For obvious reasons too, it would hang the while statement
+          // should it be inside the if block :)
+          immediateAdjacent = immediateAdjacent.next;
+        }
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Detects if a cycle is present in an undirected graph
    * using depth first search.
@@ -131,17 +185,21 @@ class GraphAlgorithms {
   }
 }
 
+const bfsGraph = new UndirectedGraphSinglyLinkedList(5);
+bfsGraph.addEdge(0, 1).addEdge(1, 2).addEdge(1, 3).addEdge(2, 4);
+console.log(GraphAlgorithms.BFS(bfsGraph));
+
 // Create undirected graph WITH cycle
-const demoGraphWithCycle = new UndirectedGraphSinglyLinkedList(5);
-demoGraphWithCycle.addEdge(1, 2).addEdge(1, 3).addEdge(2, 3);
-demoGraphWithCycle.printGraph();
+// const demoGraphWithCycle = new UndirectedGraphSinglyLinkedList(5);
+// demoGraphWithCycle.addEdge(1, 2).addEdge(1, 3).addEdge(2, 3);
+// demoGraphWithCycle.printGraph();
 
-// Test detect cycle
-console.log(GraphAlgorithms.detectCycleUndirectedGraph(demoGraphWithCycle));
+// // Test detect cycle
+// console.log(GraphAlgorithms.detectCycleUndirectedGraph(demoGraphWithCycle));
 
-// Create undirected graph WITHOUT cycle
-const demoGraphWithoutCycle = new UndirectedGraphSinglyLinkedList(5);
-demoGraphWithoutCycle.addEdge(1, 2).addEdge(1, 3).addEdge(2, 4);
+// // Create undirected graph WITHOUT cycle
+// const demoGraphWithoutCycle = new UndirectedGraphSinglyLinkedList(5);
+// demoGraphWithoutCycle.addEdge(1, 2).addEdge(1, 3).addEdge(2, 4);
 
-// Test detect cycle
-console.log(GraphAlgorithms.detectCycleUndirectedGraph(demoGraphWithoutCycle));
+// // Test detect cycle
+// console.log(GraphAlgorithms.detectCycleUndirectedGraph(demoGraphWithoutCycle));
