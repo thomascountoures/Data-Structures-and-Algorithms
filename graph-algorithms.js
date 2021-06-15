@@ -1,14 +1,24 @@
-const UndirectedGraphSinglyLinkedList = require('./undirected-graphs').UndirectedGraphSinglyLinkedList;
+const UndirectedGraphSinglyLinkedList = require('./graphs').UndirectedGraphSinglyLinkedList;
 const Stack = require('./stacksandqueues').Stack;
+const Queue = require('./stacksandqueues').Queue;
 
 /**
  * A set of useful graph algorithms for coding interviews.
  * Hopefully this helps others who may require it.
+ * 
+ * The majority of these algorithms assume that the graph
+ * uses a linked list as its data structure for adjacent nodes.
  *
  * Code and descriptions By Thomas Countoures
  */
 class GraphAlgorithms {
-  static BFS(graph) {
+  /**
+   * Depth First Search iterative implementation.
+   * 
+   * @param {*} graph 
+   * @returns nodes, traversed level by level
+   */
+  static dfsIterative(graph) {
     const vertices = graph.vertices;
     const stack = new Stack(vertices);
 
@@ -16,6 +26,8 @@ class GraphAlgorithms {
     // once we add them to the stack. We don't want to re-explore
     // nodes that we have already visited.
     const visited = {};
+
+    // The nodes we
     const result = [];
 
     // Iterate over source nodes. If source node has not already
@@ -31,9 +43,9 @@ class GraphAlgorithms {
       // immediately add its adjacent nodes onto the stack,
       // if those nodes have not already been visited.
       while (!stack.isEmpty()) {
-        const value = stack.pop();
-        result.push(value);
-        let immediateAdjacent = graph.adjacencyList[value].getHead();
+        const currentValue = stack.pop();
+        result.push(currentValue);
+        let immediateAdjacent = graph.adjacencyList[currentValue].getHead();
 
         // Since this is a linked list, we have to iterate over each
         // node in the linked list and add them to the stack. If the
@@ -41,21 +53,89 @@ class GraphAlgorithms {
         // list, we would be iterating over them using a for loop
         // instead of a while loop, for example.
         while (immediateAdjacent) {
-          const value = immediateAdjacent.value;
+          const nextValue = immediateAdjacent.value;
           // Important: only add node values to the stack if they
           // haven't yet been visited.
-          if (!(value in visited)) {
-            stack.push(value);
-            visited[value] = true;
+          if (!(nextValue in visited)) {
+            stack.push(nextValue);
+            visited[nextValue] = true;
           }
+          
           // Though it might be obvious, it's important to note here
-          // that this line is outside of the if block. We always
+          // that the line below is outside of the if block. We always
           // want to see the next adjacent node, if there is any.
           // For obvious reasons too, it would hang the while statement
           // should it be inside the if block :)
           immediateAdjacent = immediateAdjacent.next;
         }
       }
+    }
+
+    return result;
+  }
+  /**
+   * Depth first search using recursion.
+   * @param {*} graph 
+   * @returns 
+   */
+  static dfsRecursive(graph) {
+    const vertices = graph.vertices;
+    const visited = {};
+    const result = [];
+    
+    // Create recursive function inline.
+    // Eliminates the need to keep passing
+    // visited and result to each recursive call. 
+    function dfsRecurse(currentNode) {
+      visited[currentNode] = true;
+      result.push(currentNode);
+      
+      let immediateAdjacent =  graph.adjacencyList[currentNode].getHead();
+
+      while(immediateAdjacent) {
+        let value = immediateAdjacent.value;
+        if(!(value in visited)) dfsRecurse(value);
+        immediateAdjacent = immediateAdjacent.next;  
+      }
+      
+    }
+
+    for(let source = 0; source < vertices; source++) {
+      if(!(source in visited)) {
+        dfsRecurse(source);
+      }
+    }
+
+    return result;
+  }
+
+  static bfs(graph) {
+    const vertices = graph.vertices;
+    const visited = {};
+    const queue = new Queue(vertices);
+    const result = [];
+
+    for(let source = 0; source < vertices; source++) {
+      if(!(source in visited)) {
+        queue.enqueue(source);
+        visited[source] = true;
+      }
+      
+      while(!queue.isEmpty()) {
+        const currentNode = queue.dequeue();
+        result.push(currentNode);
+       
+        let immediateAdjacent = graph.adjacencyList[currentNode].getHead();
+        while(immediateAdjacent) {
+          const value = immediateAdjacent.value;
+          if(!(value in visited)) {
+            queue.enqueue(value);
+            visited[value] = true;
+          }
+          immediateAdjacent = immediateAdjacent.next;
+        }
+      }
+      
     }
 
     return result;
@@ -183,15 +263,53 @@ class GraphAlgorithms {
 
     return false;
   }
+
+  static topologicalSort(graph) {
+    const vertices = graph.vertices;
+    const visited = {};
+    const stack = new Stack(vertices);
+    const result = [];
+
+    function topSortRecurse(currentNode) {
+      visited[currentNode] = true;
+      let immediateAdjacent = graph.adjacencyList[currentNode].getHead();
+      while(immediateAdjacent) {
+        const value = immediateAdjacent.value;
+        if(!(value in visited)) {
+          topSortRecurse(value);
+          stack.push(value);
+        } 
+        immediateAdjacent = immediateAdjacent.next;
+      }
+      
+    }
+
+    for(let source = 0; source < vertices; source++) {
+      if(!(source in visited)) {
+        
+        topSortRecurse(source);
+      } 
+    }
+
+    while(!stack.isEmpty()) result.push(stack.pop());
+
+    return result;
+  }
 }
 
-const bfsGraph = new UndirectedGraphSinglyLinkedList(5);
-bfsGraph.addEdge(0, 1).addEdge(1, 2).addEdge(1, 3).addEdge(2, 4);
-console.log(GraphAlgorithms.BFS(bfsGraph));
+/**
+ * Demos - some may be commented out for testing
+ */
+const toTraverseGraph = new UndirectedGraphSinglyLinkedList(5);
+toTraverseGraph.addEdge(0, 1).addEdge(1, 2).addEdge(1, 3).addEdge(2, 4)
+console.log('DFS Iterative: ', GraphAlgorithms.dfsIterative(toTraverseGraph));
+console.log('DFS Recursive :', GraphAlgorithms.dfsRecursive(toTraverseGraph));
+console.log('BFS: ', GraphAlgorithms.bfs(toTraverseGraph));
+console.log('Topological Sort: ', GraphAlgorithms.topologicalSort(toTraverseGraph));
 
 // Create undirected graph WITH cycle
 // const demoGraphWithCycle = new UndirectedGraphSinglyLinkedList(5);
-// demoGraphWithCycle.addEdge(1, 2).addEdge(1, 3).addEdge(2, 3);
+// demoGraphWithCycle.addEdge(1, 2).addEdge(1, 3).addEd ge(2, 3);
 // demoGraphWithCycle.printGraph();
 
 // // Test detect cycle

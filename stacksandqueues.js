@@ -4,13 +4,16 @@
  * Created by Thomas Countoures
  */
 class Queue {
-  constructor() {
-    this.queue = Array;
+  constructor(size) {
     this.head = this.tail = 0;
+    this.size = size;
+    this.queue = [];
   }
 
   enqueue(value) {
-    this.queue[this.tail++] = value;
+    this.queue.push(value);
+    this.size++;
+    this.tail++;
     return this;
   }
 
@@ -23,6 +26,7 @@ class Queue {
   }
 
   dequeue() {
+    this.size--;
     return this.queue.shift();
   }
 
