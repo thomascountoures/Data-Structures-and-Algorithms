@@ -5,7 +5,7 @@ const Queue = require('./stacksandqueues').Queue;
 /**
  * A set of useful graph algorithms for coding interviews.
  * Hopefully this helps others who may require it.
- * 
+ *
  * The majority of these algorithms assume that the graph
  * uses a linked list as its data structure for adjacent nodes.
  *
@@ -14,8 +14,8 @@ const Queue = require('./stacksandqueues').Queue;
 class GraphAlgorithms {
   /**
    * Depth First Search iterative implementation.
-   * 
-   * @param {*} graph 
+   *
+   * @param {*} graph
    * @returns nodes, traversed level by level
    */
   static dfsIterative(graph) {
@@ -60,7 +60,7 @@ class GraphAlgorithms {
             stack.push(nextValue);
             visited[nextValue] = true;
           }
-          
+
           // Though it might be obvious, it's important to note here
           // that the line below is outside of the if block. We always
           // want to see the next adjacent node, if there is any.
@@ -75,33 +75,32 @@ class GraphAlgorithms {
   }
   /**
    * Depth first search using recursion.
-   * @param {*} graph 
-   * @returns 
+   * @param {*} graph
+   * @returns
    */
   static dfsRecursive(graph) {
     const vertices = graph.vertices;
     const visited = {};
     const result = [];
-    
+
     // Create recursive function inline.
     // Eliminates the need to keep passing
-    // visited and result to each recursive call. 
+    // visited and result to each recursive call.
     function dfsRecurse(currentNode) {
       visited[currentNode] = true;
       result.push(currentNode);
-      
-      let immediateAdjacent =  graph.adjacencyList[currentNode].getHead();
 
-      while(immediateAdjacent) {
+      let immediateAdjacent = graph.adjacencyList[currentNode].getHead();
+
+      while (immediateAdjacent) {
         let value = immediateAdjacent.value;
-        if(!(value in visited)) dfsRecurse(value);
-        immediateAdjacent = immediateAdjacent.next;  
+        if (!(value in visited)) dfsRecurse(value);
+        immediateAdjacent = immediateAdjacent.next;
       }
-      
     }
 
-    for(let source = 0; source < vertices; source++) {
-      if(!(source in visited)) {
+    for (let source = 0; source < vertices; source++) {
+      if (!(source in visited)) {
         dfsRecurse(source);
       }
     }
@@ -115,27 +114,26 @@ class GraphAlgorithms {
     const queue = new Queue(vertices);
     const result = [];
 
-    for(let source = 0; source < vertices; source++) {
-      if(!(source in visited)) {
+    for (let source = 0; source < vertices; source++) {
+      if (!(source in visited)) {
         queue.enqueue(source);
         visited[source] = true;
       }
-      
-      while(!queue.isEmpty()) {
+
+      while (!queue.isEmpty()) {
         const currentNode = queue.dequeue();
         result.push(currentNode);
-       
+
         let immediateAdjacent = graph.adjacencyList[currentNode].getHead();
-        while(immediateAdjacent) {
+        while (immediateAdjacent) {
           const value = immediateAdjacent.value;
-          if(!(value in visited)) {
+          if (!(value in visited)) {
             queue.enqueue(value);
             visited[value] = true;
           }
           immediateAdjacent = immediateAdjacent.next;
         }
       }
-      
     }
 
     return result;
@@ -264,34 +262,68 @@ class GraphAlgorithms {
     return false;
   }
 
+  /**
+   * Topological sort using depth first search
+   * @param {*} graph
+   */
   static topologicalSort(graph) {
     const vertices = graph.vertices;
-    const visited = {};
+    const visited = new Set();
+
+    // The stack is important here for topological sort.
+    // The difference between topological sort and doing
+    // a pure depth first search is that we only add nodes
+    // to the stack after either a) we hit a dead end (leaf
+    // node) or b) all of a particular node's child nodes have
+    // been visited (ie. immediateAdjacent.next returns null)
+    // and we break out of the while loop
+
+    // At the end of the algorithm, we return each item off the
+    // top of the stack as the result.
     const stack = new Stack(vertices);
     const result = [];
 
-    function topSortRecurse(currentNode) {
-      visited[currentNode] = true;
-      let immediateAdjacent = graph.adjacencyList[currentNode].getHead();
-      while(immediateAdjacent) {
+    function topSortRecurse(sourceNode) {
+      // Add the current node to the visited set.
+      visited.add(sourceNode);
+
+      // Go to the source for this current node. Similar to DFS.
+      let immediateAdjacent = graph.adjacencyList[sourceNode].getHead();
+
+      // While the source node has children, get the value of the node,
+      // and call this recursive method again. From here, the recursive method
+      // will continue to be called until we hit a leaf node (ie. immediateAdjacent
+      // returns null), at which point we skip the while loop and add that value to
+      // the stack.
+      while (immediateAdjacent) {
         const value = immediateAdjacent.value;
-        if(!(value in visited)) {
-          topSortRecurse(value);
-          stack.push(value);
-        } 
+        if (!visited.has(value)) topSortRecurse(value);
+        // Once we hit a leaf node, the recursive call gets popped off the stack
+        // and we resume going through any remaining adjacent nodes, doing a depth
+        // first search of these until we hit another leaf node.
+
+        // If there are no more adjacent nodes to visit, and .next is
+        // null, that means that all of this current node's children
+        // have been visited. We also exit the while loop at this condition
+        // and add this current node's value to the stack.
+
+        // REMEMBER! We only add a node to the stack when we are looking at it as a
+        // source node. Once that source node has no more children to look at,
+        // we add it to the stack. Remember that when it is a leaf node, in the adjacency
+        // list, it has no children, so we also finish in this loop and add it to the stack.
         immediateAdjacent = immediateAdjacent.next;
       }
-      
+
+      // Add source node to the stack. This is either a leaf node, or we have finished
+      // exploring all of this current node's children.
+      stack.push(sourceNode);
     }
 
-    for(let source = 0; source < vertices; source++) {
-      if(!(source in visited)) {
-        
-        topSortRecurse(source);
-      } 
+    for (let source = 0; source < vertices; source++) {
+      if (!visited.has(source)) topSortRecurse(source);
     }
 
-    while(!stack.isEmpty()) result.push(stack.pop());
+    while (!stack.isEmpty()) result.push(stack.pop());
 
     return result;
   }
@@ -301,7 +333,7 @@ class GraphAlgorithms {
  * Demos - some may be commented out for testing
  */
 const toTraverseGraph = new UndirectedGraphSinglyLinkedList(5);
-toTraverseGraph.addEdge(0, 1).addEdge(1, 2).addEdge(1, 3).addEdge(2, 4)
+toTraverseGraph.addEdge(0, 1).addEdge(1, 2).addEdge(1, 3).addEdge(2, 4);
 console.log('DFS Iterative: ', GraphAlgorithms.dfsIterative(toTraverseGraph));
 console.log('DFS Recursive :', GraphAlgorithms.dfsRecursive(toTraverseGraph));
 console.log('BFS: ', GraphAlgorithms.bfs(toTraverseGraph));
