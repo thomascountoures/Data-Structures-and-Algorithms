@@ -17,11 +17,42 @@ class BinarySearchTree {
             if(value < currentNode.value) {
                 if(currentNode.left === null) currentNode.left = new BinaryTreeNode(value);
                 else this.insert(value, currentNode.left);
-            } else if(value > currentNode.value) {
+            } else {
                 if(currentNode.right === null) currentNode.right = new BinaryTreeNode(value);
                 else this.insert(value, currentNode.right);
             }
         }
         return this;
+    }
+
+    find(value, currentNode = this.root) {
+        if(!currentNode) return null;
+        else {
+            if(value < currentNode) this.find(value, currentNode.left);
+            else if(value > currentNode) this.find(value, currentNode.right)
+            else return currentNode;
+        }
+    }
+
+    remove(value, currentNode = this.root, parentNode = null) {
+        if(!currentNode) return null;
+        else {
+            if(value < currentNode) this.remove(value, currentNode.left, currentNode);
+            else if(value > currentNode) this.remove(value, currentNode.right, currentNode);
+            else {
+                if(currentNode.left === null && currentNode.right === null)  {
+                    if(value < parentNode.value) parentNode.left = null;
+                    else parentNode.right = null;
+                } else if(currentNode.left && currentNode.right === null) {
+                    if(currentNode.left < parentNode.value) parentNode.left = currentNode.left;
+                    else parentNode.right = currentNode.left;
+                } else if(currentNode.left === null && currentNode.right) {
+                    if(currentNode.right < parentNode.value) parentNode.left = currentNode.right;
+                    else parentNode.right = currentNode.right;
+                } else {
+                    
+                }
+            }
+        }
     }
 }
