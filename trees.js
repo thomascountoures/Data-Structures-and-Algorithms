@@ -11,6 +11,13 @@ class BinarySearchTree {
     this.root = null;
   }
 
+  /**
+   * Insert a value into a BST.
+   * Time Complexity: O(log(n)) average, O(n) on extremely skewed trees
+   * Space Complexity: O(h), where h is the height of the tree - O(n) on extremely skewed trees
+   * @param {} value
+   * @param {*} currentNode
+   */
   insert(value, currentNode = this.root) {
     if (!currentNode) this.root = new BinaryTreeNode(value);
     else {
@@ -25,6 +32,13 @@ class BinarySearchTree {
     return this;
   }
 
+  /**
+   * Find a value in a BST.
+   * Time Complexity: O(log(n)) average, O(n) on extremely skewed trees
+   * Space Complexity: O(h), where h is the height of the tree - O(n) on extremely skewed trees
+   * @param {*} value
+   * @param {*} currentNode
+   */
   find(value, currentNode = this.root) {
     if (!currentNode) return null;
     else {
@@ -34,6 +48,14 @@ class BinarySearchTree {
     }
   }
 
+  /**
+   * Delete a value in a BST.
+   * Time Complexity: O(log(n)) average, O(n) on extremely skewed trees
+   * Space Complexity: O(h), where h is the height of the tree - O(n) on extremely skewed trees
+   * @param {*} value
+   * @param {*} currentNode
+   * @param {*} parentNode
+   */
   remove(value, currentNode = this.root, parentNode = this.root) {
     if (!currentNode) return null;
     else {
