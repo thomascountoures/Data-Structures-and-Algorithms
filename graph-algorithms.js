@@ -14,7 +14,7 @@ const Queue = require('./stacksandqueues').Queue;
 class GraphAlgorithms {
   /**
    * Depth First Search iterative implementation.
-   *
+   * Time complexity: O(V + E), where V are the vertices and E are the edges
    * @param {*} graph
    * @returns nodes, traversed level by level
    */
