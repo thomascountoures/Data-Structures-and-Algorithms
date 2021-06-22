@@ -1,6 +1,6 @@
 const UndirectedGraphSinglyLinkedList = require('./graphs').UndirectedGraphSinglyLinkedList;
-const Stack = require('./stacksandqueues').Stack;
-const Queue = require('./stacksandqueues').Queue;
+const Stack = require('../stacksandqueues/stacksandqueues').Stack;
+const Queue = require('../stacksandqueues/stacksandqueues').Queue;
 
 /**
  * A set of useful graph algorithms for coding interviews.

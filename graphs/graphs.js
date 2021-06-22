@@ -1,4 +1,4 @@
-const SinglyLinkedList = require('./singly-linkedlist').SinglyLinkedList;
+const SinglyLinkedList = require('../linkedlists/singly-linkedlist').SinglyLinkedList;
 
 /**
  * An undirected graph using a singly linked
