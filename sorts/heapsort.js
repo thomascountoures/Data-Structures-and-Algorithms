@@ -1,4 +1,4 @@
-class SortingAlgorithms {
+class HeapSortAlgorithms {
   /**
    * Sorts an array in ascending order.
    * Takes an unsorted array, turns it
@@ -124,11 +124,11 @@ class SortingAlgorithms {
       // Done, array is sorted
       nPointer--;
     }
-    console.log('after sort', array);
+
     return array;
   }
 }
 
 const arrayToSort = [6, 5, 3, 1, 8, 7, 2, 4];
 
-console.log(SortingAlgorithms.HeapSort(arrayToSort));
+console.log(HeapSortAlgorithms.HeapSort(arrayToSort));
