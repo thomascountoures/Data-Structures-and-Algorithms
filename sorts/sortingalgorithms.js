@@ -1,4 +1,6 @@
-class HeapSortAlgorithms {
+const SortingHelpers = require('./sortinghelpers').SortingHelpers;
+
+class SortingAlgorithms {
   /**
    * Sorts an array in ascending order.
    * Takes an unsorted array, turns it
@@ -127,8 +129,55 @@ class HeapSortAlgorithms {
 
     return array;
   }
+
+  /**
+   * Quicksort
+   * Time complexity: O(nlog(n))
+   * Space complexity: O(log(n))
+   *
+   *
+   * @param {*} array
+   */
+  static QuickSort(array) {
+    // Immediately call the quick sort helper.
+    // That's where we will do the bulk of the work.
+    quickSortHelper(array, 0, array.length - 1);
+
+    function quickSortHelper(array, startIdx, endIdx) {
+      if (startIdx >= endIdx) return;
+      console.log('array', array, 'startIdx', startIdx, 'endIdx', endIdx);
+      let pivotIndex = startIdx;
+      let lpIndex = startIdx + 1;
+      let rpIndex = endIdx;
+
+      while (rpIndex >= lpIndex) {
+        if (array[lpIndex] > array[pivotIndex] && array[rpIndex] < array[pivotIndex]) {
+          [array[lpIndex], array[rpIndex]] = [array[rpIndex], array[lpIndex]];
+          lpIndex++;
+          rpIndex--;
+        }
+
+        if (array[lpIndex] <= array[pivotIndex]) lpIndex++;
+        if (array[rpIndex] >= array[pivotIndex]) rpIndex--;
+      }
+
+      [array[pivotIndex], array[rpIndex]] = [array[rpIndex], array[pivotIndex]];
+
+      const leftSubArrayIsSmaller = rpIndex - 1 - startIdx < endIdx - (rpIndex + 1);
+      if (leftSubArrayIsSmaller) {
+        quickSortHelper(array, startIdx, rpIndex - 1);
+        quickSortHelper(array, rpIndex + 1, endIdx);
+      } else {
+        quickSortHelper(array, rpIndex + 1, endIdx);
+        quickSortHelper(array, startIdx, rpIndex - 1);
+      }
+    }
+
+    return array;
+  }
 }
 
 const arrayToSort = [6, 5, 3, 1, 8, 7, 2, 4];
 
-console.log(HeapSortAlgorithms.HeapSort(arrayToSort));
+//console.log(HeapSortAlgorithms.HeapSort(arrayToSort));
+console.log(SortingAlgorithms.QuickSort(arrayToSort));
