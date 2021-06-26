@@ -1,5 +1,3 @@
-const SortingHelpers = require('./sortinghelpers').SortingHelpers;
-
 class SortingAlgorithms {
   /**
    * Sorts an array in ascending order.
