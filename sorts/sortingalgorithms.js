@@ -143,26 +143,77 @@ class SortingAlgorithms {
     // That's where we will do the bulk of the work.
     quickSortHelper(array, 0, array.length - 1);
 
+    // The quick sort helper itself. This is what
+    // will be called recursively to sort the array.
     function quickSortHelper(array, startIdx, endIdx) {
       if (startIdx >= endIdx) return;
       console.log('array', array, 'startIdx', startIdx, 'endIdx', endIdx);
+
+      // The pivot index to which we will compare values to while we
+      // iterate through the array. In this iteration, we always start
+      // the pivot index at index 0.
       let pivotIndex = startIdx;
+
+      // We create with a left pointer and a right pointer. The left
+      // pointer always starts immediately to the right of the pivot index, 
+      // and the right pointer always starts at the end of the array.
       let lpIndex = startIdx + 1;
       let rpIndex = endIdx;
 
+      // While the right pointer is greater than the left pointer, continue
+      // the iteration. Once the left and right pointers pass each other,
+      // the iteration should stop.
       while (rpIndex >= lpIndex) {
+        // If the left pointer is greater than the pivot index, and the right pointer
+        // is smaller than the pivot index, SWAP these two values around. 
+        
+        // The reasoning for this is a bit hard to explain, but basically as we iterate
+        // through the values to right of the pivot index, we will continue to move the
+        // left pointer to the right if the number the left pointer is pointing to is
+        // smaller than the number at the pivot index. Vice versa, if the right pointer's
+        // number is bigger than the pivot index number, we continue to move it to the left.
+
+        // Why? Because at the end of the iteration (below) we always swap the pivot index
+        // with the right pointer index, wherever it ends up. This ensures that the pivot
+        // index number is properly sorted at its final spot in the array. This is indicative
+        // of the "quick sort" technique. As we iterate through the array, we place all the
+        // values that are smaller than the pivot index to the LEFT of the pivot index's final
+        // sorted spot, and all the values that are greater than the pivot index to the RIGHT
+        // of the pivot index's final sorted spot. This creates TWO SUB ARRAYS, and we
+        // recursively call this quick sort algorithm all over again on both sub arrays.
         if (array[lpIndex] > array[pivotIndex] && array[rpIndex] < array[pivotIndex]) {
           [array[lpIndex], array[rpIndex]] = [array[rpIndex], array[lpIndex]];
           lpIndex++;
           rpIndex--;
         }
 
+        // As mentioned above, if the left pointer points to a smaller number than the
+        // pivot index, move the left pointer to the right.
         if (array[lpIndex] <= array[pivotIndex]) lpIndex++;
+
+        // Vice versa for the right pointer, if it's pointing to a number greater than
+        // the pivot index, move the right pointer to the left.
         if (array[rpIndex] >= array[pivotIndex]) rpIndex--;
       }
 
+      // At the end of the iteration, always swap the pivot index with the right pointer index.
       [array[pivotIndex], array[rpIndex]] = [array[rpIndex], array[pivotIndex]];
 
+      // The why logic might not be obvious upon first glance, but what is going on here is that
+      // we always want to call quick sort on the smaller sub array first. This is specifically
+      // to do with time complexity. If we start our recursion on the bigger sub array, we may
+      // end up with (at worst case) an O(n) time complexity. This is because if for whatever
+      // reason the sub arrays in the forthcoming recursive calls kept creating a sub array of
+      // a length of 1, and put the rest of the numbers in the other sub array, we would continue
+      // to re-iterate through (almost) the entire length of the array again. At worst case this
+      // could happen over and over again and we would end up with O(n) calls on the call stack.
+
+      // We want to make sure that we call the quicksort on the smaller sub array first, because
+      // with that technique you will at most only make O(log(n)) calls and have O(log(n)) space
+      // on the call stack AT ONCE. We will let tail recursion (not supported in all languages,
+      // I believe ES6 at the time of writing this comment supports it, at least in some browers)
+      // which removes the memory usage on the call stack after we've finished applying quick sort
+      // to the smaller sub arrays. 
       const leftSubArrayIsSmaller = rpIndex - 1 - startIdx < endIdx - (rpIndex + 1);
       if (leftSubArrayIsSmaller) {
         quickSortHelper(array, startIdx, rpIndex - 1);
