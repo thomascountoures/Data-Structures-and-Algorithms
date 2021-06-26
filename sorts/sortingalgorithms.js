@@ -135,7 +135,7 @@ class SortingAlgorithms {
    * Time complexity: O(nlog(n))
    * Space complexity: O(log(n))
    *
-   *
+   * Sorts IN PLACE
    * @param {*} array
    */
   static QuickSort(array) {
@@ -226,9 +226,69 @@ class SortingAlgorithms {
 
     return array;
   }
+  
+  /**
+   * Merge sort
+   * Time complexity: O(nlog(n))
+   * Space Complexity: O(n) (uses helper arrays to store sub arrays)
+   * 
+   * Does NOT sort in place
+   * @param {*} array 
+   * @returns 
+   */
+  static MergeSort(array) {
+    if(array.length <= 1) return array;
+    // Left half of this array.
+    const leftSide = array.splice(0, Math.floor(array.length / 2));
+    // Right half of this array. We actually could in theory not even
+    // have to declare this variable, as splicing half of the array 
+    // for the left side leaves the rest of the array parameter as the
+    // right side. We could just pass in 'array' as the parameter to
+    // the merge sort in the second parameter of mergeArrays below,
+    // but this makes it a bit more readable. :)
+    const rightSide = array;
+
+    // Once the passed in array has a length of 1, we will call this
+    // helper method to merge and sort the two arrays together. This
+    // is where "merge sort" comes from. It is also the "conquer" in
+    // our divide and conquer technique. Note that when this is called
+    // as the methods are popped off the stack, array1 and array2 will
+    // continue to be larger in size (sorted). The length of 1 is our
+    // base case and the arrays will only have a length of 1 when this
+    // method is first called.
+    function mergeArrays(array1, array2) {
+      const result = [];
+      while(array1.length && array2.length) {
+        if(array1[0] < array2[0]) result.push(array1.shift());
+        else result.push(array2.shift());
+      }
+      // We return it like this because there may be some "straggler" numbers
+      // left over after we insert the sorted numbers into the result array.
+      // This is due to the fact that the two arrays being sorted here have
+      // differing lengths. This is fine. We just "tack on" any remaining
+      // numbers left over. We can trust these to be sorted as these numbers
+      // are the largest numbers in both arrays and were bigger than every
+      // number already inserted into the result array.
+      return [...result, ...array1, ...array2];
+    }
+
+    // Note: We could return it outright like this here, but below I want it to be more readable.
+    // --> return mergeArrays(this.MergeSort(leftSide), this.MergeSort(rightSide));
+
+    // First, completely sort the left side.
+    const leftSideSorted = this.MergeSort(leftSide);
+    // Then completely sort the right side.
+    const rightSideSorted = this.MergeSort(rightSide);
+    
+    // Merge both the left sorted and right sorted arrays together.
+    // Keep popping these sorted arrays off the stack until we have
+    // a final sorted array.
+    return mergeArrays(leftSideSorted, rightSideSorted);
+  }
 }
 
 const arrayToSort = [6, 5, 3, 1, 8, 7, 2, 4];
 
 //console.log(HeapSortAlgorithms.HeapSort(arrayToSort));
-console.log(SortingAlgorithms.QuickSort(arrayToSort));
+//console.log(SortingAlgorithms.QuickSort(arrayToSort));
+console.log(SortingAlgorithms.MergeSort(arrayToSort));
