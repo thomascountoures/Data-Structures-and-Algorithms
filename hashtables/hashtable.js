@@ -1,33 +1,104 @@
-const SinglyLinkedList = require('../linkedlists/singly-linkedlist');
-
 class HashTable {
-  constructor(size) {
-    this.size = size;
-    this.buckets = Array(size);
+  constructor(limit) {
+    this.buckets = [];
+    this.limit = limit;
 
-    for (let i = 0; i < this.size; i++) {
-      this.buckets[i] = new SinglyLinkedList();
+    for (let i = 0; i < limit; i++) {
+      this.buckets[i] = new HashTableSinglyLinkedList();
     }
   }
 
   hash(key) {
-    let hashedKey = '';
+    let result = '';
     for (let i = 0; i < key.length; i++) {
-      hashedKey += key[i].charCodeAt();
+      result += key.charCodeAt(i);
     }
-    return hashedKey % this.size;
+    return result % this.limit;
   }
 
   insert(key, value) {
-    if (!key || !value) throw new Error('Key and value required.');
-    const hashedKey = this.hash(key);
-    this.buckets[hashedKey].append(value);
-    return value;
+    const hash = this.hash(key);
+    const bucket = this.buckets[hash];
+    bucket.append(key, value);
   }
 
-  get(key) {
-    if (!key) throw new Error('Please specify a key.');
-    const hashedKey = this.hash(key);
-    const value = this.buckets[hashedKey].find();
+  remove(key) {
+    const hash = this.hash(key);
+    const bucket = this.buckets[hash];
+    bucket.remove(key);
+  }
+}
+
+class HashTableSinglyLinkedList {
+  constructor() {
+    this.head = null;
+    this.size = 0;
+  }
+
+  getHead() {
+    return this.head;
+  }
+
+  getSize() {
+    return (this.size = 0);
+  }
+
+  insert(key, value) {
+    if (!this.head) this.head = new Node(key, value);
+    let currentNode = this.head;
+    while (currentNode) {
+      if (currentNode.next !== null) {
+        // Keys must be unique. Do not add to linkedlist
+        // if key already exists. Instead overwrite the value.
+        if (key === currentNode.key) currentNode.value = value;
+        currentNode = currentNode.next;
+      } else {
+        currentNode.next = new Node(key, value);
+        this.size++;
+      }
+    }
+  }
+
+  remove(key) {
+    if (!this.head) return null;
+    let currentNode = this.head;
+    let previousNode = null;
+
+    while (currentNode) {
+      if (key !== currentNode.key) {
+        previousNode = currentNode;
+        currentNode = currentNode.next;
+      } else {
+        previousNode.next = currentNode.next;
+        currentNode.next = null;
+        this.size--;
+        break;
+      }
+    }
+  }
+
+  removeAt(i) {
+    if (!this.head) return null;
+    let currentNode = this.head;
+    let previousNode = null;
+    let counter = 0;
+    while (currentNode) {
+      if (counter !== i) {
+        previousNode = currentNode;
+        currentNode = currentNode.next;
+      } else {
+        previousNode.next = currentNode.next;
+        currentNode.next = null;
+        this.size--;
+        break;
+      }
+    }
+  }
+}
+
+class Node {
+  constructor(key, value) {
+    this[key] = key;
+    this.value = value;
   }
 }
